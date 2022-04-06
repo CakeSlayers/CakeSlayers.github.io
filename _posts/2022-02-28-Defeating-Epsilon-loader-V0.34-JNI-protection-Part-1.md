@@ -147,7 +147,7 @@ MethodNode decryptor = TransformerHelper.findMethodNode(classNode, callDecryptor
 
 After some more analysis, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
 
-During the previous section, we have known that just before the last `ixor` instruction is about to be executed by JVM, the value of the top stack is the XOR key. Why don't we analyze the frame statically and grab the top-stack value as the  XOR key?
+During the previous section, we have known that just before the last `ixor` instruction is about to be executed by JVM, and the value of the top stack is the XOR key. Why don't we analyze the frame statically and grab the top-stack value as the  XOR key?
 
 The following code shows how we filter out the last XOR instruction using `Deobfuscator`'s `InstructionMatcher`
 
@@ -168,7 +168,7 @@ if (lastIxor == null) {
 }
 ```
 
-
+------
 
 Then we analyzed the frame statically using the power of SimAnalyzer and get the XOR key from the top of the stack:
 
