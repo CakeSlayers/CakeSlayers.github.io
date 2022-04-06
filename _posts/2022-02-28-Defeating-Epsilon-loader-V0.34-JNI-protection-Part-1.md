@@ -5,8 +5,6 @@ tags: [reverse-engineering, java, jni, indy]
 img_path: /assets/img/eloader034-jni-p1/
 ---
 
-## TL;DR
-
 Epsilon Loader V0.34 has been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It's also widely believed that the authentication part of Epsilon is achieved in the DLL. So let's look inside the DLL and related JVM classes to determine what role the DLL plays and find out whether we can exploit it.
 
 
