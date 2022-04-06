@@ -25,7 +25,7 @@ title: HorizonLN                          # the main title
 
 tagline: Make reverse engineering visual!   # it will display as the sub-title
 
-description: >-                        # used by seo meta and the atom feed
+#description: >-                        # used by seo meta and the atom feed
 
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
@@ -34,8 +34,8 @@ url: 'https://HorizonLN.github.io'
 github:
   username: HorizonLN             # change to your github username
 
-twitter:
-  username:             # change to your twitter username
+#twitter:
+#  username:             # change to your twitter username
 
 social:
   # Change to your full name.
@@ -43,8 +43,6 @@ social:
   name: HorizonLN
   email: HorizonLN@outlook.com             # change to your email address
   links:
-    # The first element serves as the copyright owner's link
-    # - https://twitter.com/username      # change to your twitter homepage
     - https://github.com/HorizonLN       # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
