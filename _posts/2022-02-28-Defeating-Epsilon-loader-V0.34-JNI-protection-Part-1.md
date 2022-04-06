@@ -1,5 +1,5 @@
 ---
-title: Defeating Epsilon Loader V0.34 JNI Protection: Part 1
+title: Defeating Epsilon loader V0.34 JNI protection Part 1
 date: 2022-02-28
 tags: [reverse-engineering, java, jni, indy]
 ---
