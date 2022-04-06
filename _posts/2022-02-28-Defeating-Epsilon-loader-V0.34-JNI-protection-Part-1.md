@@ -247,6 +247,10 @@ Screenshot above is a part of `ESKID` method.
 
 In Part 2 we'll dig into the details of the native DLL exploration and reveal the connections between Invokedynamic and JNI.
 
+
+
+## Footnotes
+
 [^1]: Invokedynamic
 
 [^2]: bootstrap method
