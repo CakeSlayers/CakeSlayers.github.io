@@ -24,7 +24,7 @@ Epsilon Loader V0.34 has been considered as "STRONG obfuscated" as well as "uncr
 
 The first thing we wanted to do is to analyze the process of the DLL loading in Bytecode-Level, so we just searched for string "DLL" using Recaf.
 
-![stringSearchResult](assets/stringSearchResult.png)
+![stringSearchResult](..//assets/img/eloader034-jni-p1/stringSearchResult.png)
 
 So we traced down to the class called `ESKID` and analyze its method member "clinit".
 
@@ -54,7 +54,7 @@ So we move on to the method `a`  which is the bootstrap method and start with th
 
 ## Function of  the BSM[^2]
 
-![HandleType](assets/HandleType.png)
+![HandleType](..//assets/img/eloader034-jni-p1/img/eloader034-jni-p1/HandleType.png)
 
 Using Threadtear's powerful CFG[^3] (The graph above is optimized) , we can figure out that the role of the integer argument is to specify the invoke-type.
 
@@ -91,7 +91,7 @@ So let's dig deeper into the method `ESKID.b` .
 
 
 
-![decryption_process](assets/decryption_process.png)
+![decryption_process](..//assets/img/eloader034-jni-p1/img/eloader034-jni-p1/decryption_process.png)
 
 Screenshot above is the last part of `ESKID.b`'s CFG[^3] . 
 
@@ -109,7 +109,7 @@ fun decrypt(enc: String): String {
 }
 ```
 
-![visual_decryptor](assets/visual_decryptor.png)
+![visual_decryptor](..//assets/img/eloader034-jni-p1/visual_decryptor.png)
 
 
 
@@ -238,7 +238,7 @@ Download the complete source code of this Indy transformer using the link: [publ
 
 ## Final results
 
-![result](assets/result.png)
+![result](..//assets/img/eloader034-jni-p1/result.png)
 
 Screenshot above is a part of `ESKID` method.
 
