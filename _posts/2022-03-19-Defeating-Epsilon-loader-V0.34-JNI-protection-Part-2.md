@@ -2,7 +2,7 @@
 title: Defeating Epsilon Loader V0.34 JNI Protection Part 2
 date: 2022-03-19
 tags: [reverse-engineering, java, jni, indy]
-img_path: /assets/img/eloader034-jni-p1/
+img_path: /assets/img/eloader034-jni-p2/
 ---
 
 ## Intro
