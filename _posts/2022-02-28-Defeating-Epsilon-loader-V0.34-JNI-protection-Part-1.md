@@ -1,5 +1,5 @@
 ---
-title: Defeating Epsilon loader V0.34 JNI protection Part 1
+title: Defeating Epsilon Loader V0.34 JNI Protection: Part 1
 date: 2022-02-28
 tags: [reverse-engineering, java, jni, indy]
 img_path: /assets/img/eloader034-jni-p1/
@@ -7,17 +7,13 @@ img_path: /assets/img/eloader034-jni-p1/
 
 Epsilon Loader V0.34 has been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It's also widely believed that the authentication part of Epsilon is achieved in the DLL. So let's look inside the DLL and related JVM classes to determine what role the DLL plays and find out whether we can exploit it.
 
-
-
 ## Basic Information about the DLL
 
-|      Arch       |               x64               |
-| :-------------: | :-----------------------------: |
-|    Compiler     | Visual C/C++(19.00.30034)[C++]  |
-|     Packed?     |               NO                |
+| Arch            | x64                             |
+|:---------------:|:-------------------------------:|
+| Compiler        | Visual C/C++(19.00.30034)[C++]  |
+| Packed?         | NO                              |
 | Virus Detection | NO(Using Virus-Total & Intezer) |
-
-
 
 ## Initial analysis of DLL loading process
 
@@ -26,8 +22,6 @@ The first thing we wanted to do is to analyze the process of the DLL loading in 
 ![stringSearchResult](stringSearchResult.png)
 
 So we traced down to the class called `ESKID` and analyze its method member "clinit".
-
-
 
 ## Indy[^1] in action
 
@@ -49,8 +43,6 @@ ESKID.a(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invo
 
 So we move on to the method `a`  which is the bootstrap method and start with the 4th argument because its integer type gives us a lot of enlightenment.
 
-
-
 ## Function of  the BSM[^2]
 
 ![HandleType](HandleType.png)
@@ -58,21 +50,17 @@ So we move on to the method `a`  which is the bootstrap method and start with th
 Using Threadtear's powerful CFG[^3] (The graph above is optimized) , we can figure out that the role of the integer argument is to specify the invoke-type.
 
 | Value | Invoke-Type |
-| :---: | :---------: |
-|   1   |   Virtual   |
-|   2   |   Static    |
-|   3   |   Special   |
-
-
+|:-----:|:-----------:|
+| 1     | Virtual     |
+| 2     | Static      |
+| 3     | Special     |
 
 Although "str1", "str2" and "str3"  were obfuscated strings but their functions can be easily recognized too.
 
-| str1 |    target class's name    |
-| :--: | :-----------------------: |
-| str2 |   target method's name    |
+| str1 | target class's name       |
+|:----:|:-------------------------:|
+| str2 | target method's name      |
 | str3 | target method's signature |
-
-
 
 ## Algorithm
 
@@ -87,8 +75,6 @@ INVOKESTATIC ESKID.b (Ljava/lang/String;)Ljava/lang/String;
 Bytecode above is the pattern of string decryption. It's certain that `ESKID.b` is the method for string decryption in this case.
 
 So let's dig deeper into the method `ESKID.b` .
-
-
 
 ![decryption_process](decryption_process.png)
 
@@ -109,8 +95,6 @@ fun decrypt(enc: String): String {
 ```
 
 ![visual_decryptor](visual_decryptor.png)
-
-
 
 ## Automation
 
@@ -143,8 +127,6 @@ if (callDecryptor == null) {
 MethodNode decryptor = TransformerHelper.findMethodNode(classNode, callDecryptor.name, callDecryptor.desc);
 ```
 
-
-
 After some more analysis, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
 
 During the previous section, we have known that just before the last `ixor` instruction is about to be executed by JVM, and the value of the top stack is the XOR key. Why don't we analyze the frame statically and grab the top-stack value as the  XOR key?
@@ -167,8 +149,6 @@ if (lastIxor == null) {
     return;
 }
 ```
-
-------
 
 Then we analyzed the frame statically using the power of SimAnalyzer and get the XOR key from the top of the stack:
 
@@ -202,8 +182,6 @@ try {
 }
 ```
 
-
-
 Now we have obtained all the information we need to preform the deobfuscation, and the last necessary part is how we determine the invocation type. See the code snippet below:
 
 ```java
@@ -229,11 +207,7 @@ switch ((int) bsmArgs[3]) {
 }
 ```
 
-
-
 Download the complete source code of this Indy transformer using the link: [public s00n]
-
-
 
 ## Final results
 
@@ -241,13 +215,9 @@ Download the complete source code of this Indy transformer using the link: [publ
 
 Screenshot above is a part of `ESKID` method.
 
-
-
 ## What’s next?
 
 In Part 2 we'll dig into the details of the native DLL exploration and reveal the connections between Invokedynamic and JNI.
-
-
 
 ## Footnotes
 
@@ -256,4 +226,3 @@ In Part 2 we'll dig into the details of the native DLL exploration and reveal th
 [^2]: bootstrap method
 
 [^3]: control flow graph
-
