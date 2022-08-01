@@ -67,7 +67,7 @@ To learn more about the native methods in the DLL, we analyzed some other method
 
 ### Thunk function
 
-The JNI function `Java_ESKID_AwUlqtUfLk` was chosen for our initial analyze. 
+The JNI function `Java_ESKID_AwUlqtUfLk` was chosen for our initial analyze.
 
 ![thunk_func](thunk_func.png)
 
@@ -142,7 +142,8 @@ So I just wrote a IDA-python script for this task.
 
 Download link: [TODO]
 
-**WARNING : YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST TO RUN THIS SCRIPT!**
+> YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST TO RUN THIS SCRIPT!
+{: .prompt-danger }
 
 ```python
 ########################################################################
