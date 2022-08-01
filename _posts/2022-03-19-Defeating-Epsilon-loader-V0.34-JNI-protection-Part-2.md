@@ -142,7 +142,7 @@ So I just wrote a IDA-python script for this task.
 
 Download link: [TODO]
 
-**WARNING : YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST!**
+**WARNING : YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST TO RUN THIS SCRIPT!**
 
 ```python
 ########################################################################
@@ -302,8 +302,6 @@ The DLL was backdoored:
 
 ![dll_backdoor](dll_backdoor.png)
 
-BotDebug once triggered @smallshen 's AntiLeak and got backdoored:
-
 ![ez_botdebug_p2](ez_botdebug_p2.png)
 
 The GIF below is the real thing AntiLeak will do once triggered:
@@ -312,13 +310,13 @@ The GIF below is the real thing AntiLeak will do once triggered:
 
 ## Credit
 
-Thanks @smallshen for hijacking our PCs using his "POWERFUL" AntiLeak and disgusting us ^ ^ 
+Thanks @smallshen for hijacking our PCs using his POWERFUL AntiLeak
 
 ![copyrighted-jar-protected-by-smallshen](copyrighted-jar-protected-by-smallshen.png)
 
-(A reply to Smallshen's writeup [BruhSkid](https://github.com/smallshen/BruhSkid) )
+(We recommand Smallshen's writeup [BruhSkid](https://github.com/smallshen/BruhSkid) )
 
-Thanks Juanye for "encouraging" us:
+Thanks Juanye for encouraging us:
 
 ![juanye_laughs](juanye_laughs.png)
 
