@@ -1,7 +1,8 @@
 ---
-title: Defeating Epsilon Loader V0.34 JNI Protection Part 2
+title: "Defeating Epsilon Loader V0.34 Vol. 2: The JNI Protection"
 date: 2022-03-19
 tags: [reverse-engineering, java, jni, indy]
+authors: [UnfortuneCookie, Trdyun, Xiguajerry]
 img_path: /assets/img/eloader034-jni-p2/
 ---
 
@@ -17,7 +18,7 @@ The following pseudocode snippets are **heavily** beautified. You will not be ab
 
 After we obtain the indy-deobfuscated sample, we are now able to analyze the `clinit` method of the class `ESKID` and find out how the DLL is loaded.
 
-### Getting OS type
+### 1.Getting the OS type
 
 The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL
 
@@ -41,7 +42,7 @@ if (osType.contains("nux")) {
 
 However, its cross-platform functionality is actually not complete because of the absence of the DLL file `mac.dat` and `unix.dat` .
 
-### Loading the DLL
+### 2.Extracting and loading the DLL
 
 Because of some restrictions, DLLs in the jar could not be loaded directly, so it's necessary to go through the process of extracting the DLL from the jar to the temp folder and load the extracted DLL:
 
@@ -59,15 +60,16 @@ tempDllFile.deleteOnExit();
 System.load(tempDllFile.getAbsolutePath());
 ```
 
-PS: The JNI methods were all defined under the class `ESKID` .
+> All the pseudocode above are in the class `ESKID` .
+{: .prompt-tip }
 
 ## Inside the DLL
 
-To learn more about the native methods in the DLL, we analyzed some other methods under the package `com/loader/epsilon` . We were surprise that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyze deeper into the DLL itself.
+In an attempt to learn more about the native methods in the DLL, we analysed some other methods under the package `com/loader/epsilon` . We were surprise that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyse deeper into the DLL itself.
 
 ### Thunk function
 
-The JNI function `Java_ESKID_AwUlqtUfLk` was chosen for our initial analyze.
+We choose a random JNI function `Java_ESKID_AwUlqtUfLk` for our initial analyze.
 
 ![thunk_func](thunk_func.png)
 
@@ -77,7 +79,7 @@ The IDA has already identified this function as thunk function because it only h
 
 Then we followed the jump to the function `Java_ESKID_AwUlqtUfLk_0` :
 
-```assembly
+```nasm
 .text:0000000180009EC0 Java_ESKID_AwUlqtUfLk_0 proc near       ; CODE XREF: Java_ESKID_AwUlqtUfLk↑j
 .text:0000000180009EC0                                         ; DATA XREF: .pdata:00000001800AA0B4↓o
 .text:0000000180009EC0
@@ -100,9 +102,9 @@ Subsequently we observe 3 strings as arguments for the **single** `call` . It's 
 
 ### Another Thunk Function
 
-In turn we seeked to the function `j_eCallStaticObjectMethodV` .
+In turn we seek to the function `j_eCallStaticObjectMethodV` .
 
-`j_eCallStaticObjectMethodV` is another thunk function which jumps to the function `eCallStaticObjectMethodV` .
+It turns out that `j_eCallStaticObjectMethodV` is another thunk function which jumps to the function `eCallStaticObjectMethodV` .
 
 ### JNI helper Function
 
@@ -261,7 +263,7 @@ with open("proxy_info.json", "w", encoding="utf-8") as f:
     print("data exported!")
 ```
 
-Below is a small piece of the result file --  `proxy_info.json` :
+Below is a small part of the result file --  `proxy_info.json` :
 
 ```json
 {
@@ -283,7 +285,7 @@ Below is a small piece of the result file --  `proxy_info.json` :
         "signature": "(Ljava/lang/String;)Ljava/lang/String;",
         "type": "static"
     },
-    {...}
+    ...
 }
 ```
 

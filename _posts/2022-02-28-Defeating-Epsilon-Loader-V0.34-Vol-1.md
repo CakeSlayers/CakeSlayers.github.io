@@ -1,33 +1,35 @@
 ---
-title: Defeating Epsilon Loader V0.34 JNI Protection Part 1
+title: "Defeating Epsilon Loader V0.34 Vol. 1: The InvokeDynamic"
 date: 2022-02-28
 tags: [reverse-engineering, java, jni, indy]
+authors: [UnfortuneCookie, Trdyun, Xiguajerry]
 img_path: /assets/img/eloader034-jni-p1/
 ---
 
-Epsilon Loader V0.34 has been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It's also widely believed that the authentication part of Epsilon is achieved in the DLL. So let's look inside the DLL and related JVM classes to determine what role the DLL plays and find out whether we can exploit it.
+Epsilon Loader V0.34 has been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It's also widely believed that the authentication part of Epsilon is achieved in the DLL. So let's look inside the DLL and the related JVM classes to determine what role the DLL plays and find out whether we can exploit it.
 
 ## Basic Information about the DLL
 
-| Arch            | x64                             |
+| Name            |                                 |
 |:---------------:|:-------------------------------:|
+| Arch            | x64                             |
 | Compiler        | Visual C/C++(19.00.30034)[C++]  |
 | Packed?         | NO                              |
 | Virus Detection | NO(Using Virus-Total & Intezer) |
 
-## Initial analysis of DLL loading process
+## Initial analysis of the DLL loading process
 
-The first thing we wanted to do is to analyze the process of the DLL loading in Bytecode-Level, so we just searched for string "DLL" using Recaf.
+The first thing we want to figure out is the process of the DLL loading in Bytecode-Level, so we searched for the string "DLL" using Recaf.
 
 ![stringSearchResult](stringSearchResult.png)
 
-So we traced down to the class called `ESKID` and analyze its method member "clinit".
+It's so lucky that the dll's filename was not encrypted. So we can find a suspicious class called `ESKID` and its static initizer "clinit".
 
 ## Indy[^1] in action
 
 The first evident obstacle we have to deal with is the `Invokedynamic Obfuscation`.
 
-For instance look at the following `invokedynamic` instruction (We assumed that we are experienced with this instruction. If you are not, I'd recommend you to the article:https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic):
+For instance look at the following `invokedynamic` instruction (We assumed that we are familiar  with this instruction. If you are not, We recommend you to the article:https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic):
 
 ```java
 INVOKEDYNAMIC i(Ljava/lang/Object;Ljava/lang/Object;)Ljava/io/InputStream; [
@@ -41,13 +43,13 @@ ESKID.a(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invo
 ]
 ```
 
-So we move on to the method `a`  which is the bootstrap method and start with the 4th argument because its integer type gives us a lot of enlightenment.
+So we move on to the method `a`  which is the bootstrap method and start with the suspicious 4th  integer argument.
 
-## Function of  the BSM[^2]
+## The usage of the BSM[^2]
 
 ![HandleType](HandleType.png)
 
-Using Threadtear's powerful CFG[^3] (The graph above is optimized) , we can figure out that the role of the integer argument is to specify the invoke-type.
+Using Threadtear's powerful CFG[^3] (The graph above is optimized) , we can easily figure out that the role of the 4th integer argument is to specify the invoke-type.
 
 | Value | Invoke-Type |
 |:-----:|:-----------:|
@@ -104,7 +106,7 @@ Starting with nothing, we should find BSM[^2] and decryptor method first.
 
 ```java
 //find BSM
-MethodNode bsm = classNode.methods.parallelStream()
+MethodNode bsm = classNode.methods
         .filter(method -> method.desc.equals(bootstrapDesc))
         .findFirst().orElse(null);
 if (bsm == null) return;
@@ -115,7 +117,6 @@ final InstructionPattern decryptionPattern = new InstructionPattern(
         new InvocationStep(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false)
 );
 MethodInsnNode callDecryptor = (MethodInsnNode) Arrays.stream(bsm.instructions.toArray())
-        .parallel()
         .filter(ain -> {
             InstructionMatcher matcher = decryptionPattern.matcher(ain);
             return matcher.find() && (matcher.getCapturedInstructions("all").get(0) == ain);
@@ -139,7 +140,6 @@ final InstructionPattern algorithmPattern = new InstructionPattern(
         new OpcodeStep(I2C),
         new InvocationStep(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false));
 AbstractInsnNode lastIxor = Arrays.stream(decryptor.instructions.toArray())
-        .parallel()
         .filter(ain -> {
             InstructionMatcher matcher = algorithmPattern.matcher(ain);
             return matcher.find() && (matcher.getCapturedInstructions("all").get(0) == ain);
@@ -182,7 +182,7 @@ try {
 }
 ```
 
-Now we have obtained all the information we need to preform the deobfuscation, and the last necessary part is how we determine the invocation type. See the code snippet below:
+Now we have obtained all the information we need to preform the deobfuscation, so the last necessary part is how we determine the invocation type:
 
 ```java
 Object[] bsmArgs = ((InvokeDynamicInsnNode) indy).bsmArgs;
