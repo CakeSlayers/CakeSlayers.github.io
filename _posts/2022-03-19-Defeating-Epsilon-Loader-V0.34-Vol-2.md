@@ -3,7 +3,7 @@ title: "Defeating Epsilon Loader V0.34 Vol. 2: The JNI Protection"
 date: 2022-03-19
 tags: [reverse-engineering, java, jni, indy]
 authors: [UnfortuneCookie, Trdyun, Xiguajerry]
-img_path: /assets/img/eloader034-jni-p2/
+img_path: /assets/eloader034-p2/
 ---
 
 ## Intro
@@ -295,7 +295,7 @@ Below is a small part of the result file --  `proxy_info.json` :
 
 With the data we extracted, we can write another custom transformer to deobfuscate them automatically. The deobfuscation process is like the diagram below.
 
-![diff](diff.png)Here's the source code: [TODO LINK HERE]
+![diff](diff.png)Here's the source code: [public s00n]
 
 We can combine part1 and part2 together to form the complete graph:
 

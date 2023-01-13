@@ -3,7 +3,7 @@ title: "Defeating Epsilon Loader V0.34 Vol. 1: The InvokeDynamic"
 date: 2022-02-28
 tags: [reverse-engineering, java, jni, indy]
 authors: [UnfortuneCookie, Trdyun, Xiguajerry]
-img_path: /assets/img/eloader034-jni-p1/
+img_path: /assets/eloader034-p1/
 ---
 
 Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It was also widely believed that the authentication and verification part of Epsilon is achieved in the DLL[^1]. So let's look inside the DLL and the related JVM classes to determine what role the DLL plays and find out whether we can fuck it out.
@@ -211,7 +211,7 @@ switch ((int) bsmArgs[3]) {
 }
 ```
 
-Download the complete source code of this Indy transformer using the link: [will be public s00n]
+Download the complete source code of this Indy transformer using the link: [StaticIndyTransformer.java](/assets/eloader034-p1/StaticIndyTransformer.java)
 
 ## Final results
 
