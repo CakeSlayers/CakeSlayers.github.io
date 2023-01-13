@@ -8,11 +8,11 @@ img_path: /assets/img/eloader034-jni-p2/
 
 ## Intro
 
-Last time we deobfuscated the Indys and reveal the "real invocation", in this post we will focus on analyzing both the related bytecode and the DLL to reveal the truth.
+In the last article we deobfuscated the Indys and reveal the "real invocation", in this post we will focus on analyzing both the related bytecode and the DLL to reveal the truth.
 
 ## Disclaimer
 
-The following pseudocode snippets are **heavily** beautified. You will not be able to instantly recognize some of these parts; lots of junk code and algorithms are unrolled. That doesn’t really matter, as when you’re finished reading about this kind of protection, you will have a field day breaking it (=
+The following pseudocode snippets are **heavily** beautified. You may not be able to instantly recognize some of these parts; lots of junk code and algorithms are unrolled. But that doesn’t really matter, as when you finish reading about this kind of protection, you will have a fine day breaking it (=
 
 ## DLL loading process
 
@@ -22,7 +22,7 @@ After we obtain the indy-deobfuscated sample, we are now able to analyze the `cl
 
 The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL
 
-This is their implementation:
+This is an abstract of their implementation:
 
 ```java
 String osType = System.getProperty("os.name").toLowerCase();
@@ -40,11 +40,11 @@ if (osType.contains("nux")) {
 }
 ```
 
-However, its cross-platform functionality is actually not complete because of the absence of the DLL file `mac.dat` and `unix.dat` .
+However, its cross-platform functionality is actually deformed because of the absence of the DLL file `mac.dat` and `unix.dat` .
 
 ### 2.Extracting and loading the DLL
 
-Because of some restrictions, DLLs in the jar could not be loaded directly, so it's necessary to go through the process of extracting the DLL from the jar to the temp folder and load the extracted DLL:
+Because of some restrictions, DLLs in the jar could not be loaded directly. Thus it's necessary to extract the DLL to a temporary file before loading it.
 
 ```java
 File tempDllFile = File.createTempFile("eskidontop", ".dat");
@@ -65,7 +65,7 @@ System.load(tempDllFile.getAbsolutePath());
 
 ## Inside the DLL
 
-In an attempt to learn more about the native methods in the DLL, we analysed some other methods under the package `com/loader/epsilon` . We were surprise that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyse deeper into the DLL itself.
+In an attempt to learn more about the native methods in the DLL, we analysed some other methods under the package `com/loader/epsilon` . We were surprised that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyse deeper into the DLL itself.
 
 ### Thunk function
 
@@ -73,7 +73,7 @@ We choose a random JNI function `Java_ESKID_AwUlqtUfLk` for our initial analyze.
 
 ![thunk_func](thunk_func.png)
 
-The IDA has already identified this function as thunk function because it only has one instruction.
+The IDA has already marked this function as thunk function because it only has one instruction.
 
 ### 3 suspicious strings
 
@@ -98,7 +98,7 @@ Then we followed the jump to the function `Java_ESKID_AwUlqtUfLk_0` :
 .text:0000000180009EE7 Java_ESKID_AwUlqtUfLk_0 endp
 ```
 
-Subsequently we observe 3 strings as arguments for the **single** `call` . It's obvious that these strings are class name, method name and signature.
+Subsequently we observe 3 strings as arguments for the **single** `call`. we can obviously know that these strings are class name, method name and signature.
 
 ### Another Thunk Function
 
@@ -111,16 +111,18 @@ It turns out that `j_eCallStaticObjectMethodV` is another thunk function which j
 The pseudocode of the function looks like this:
 
 ```c
-jobject eCallStaticObjectMethodV(JNIEnv_ *Env, const char *className, const char *methodName, const char *signature, ...)
+jobject eCallStaticObjectMethodV(JNIEnv_ *env, const char *className, const char *methodName, const char *signature, ...)
 {
   struct _jobject *clazz; // rbx
   struct _jmethodID *methodID; // rax
   va_list args; // [rsp+70h] [rbp+28h] BYREF
 
   va_start(args, signature);
-  clazz = Env->functions->FindClass(&Env->functions, className);
-  methodID = Env->functions->GetStaticMethodID(&Env->functions, clazz, methodName, signature);
-  return Env->functions->CallStaticObjectMethodV(&Env->functions, clazz, methodID, args);
+  clazz = env->functions->FindClass(&env->functions, className);
+  methodID = env->functions->GetStaticMethodID(&env->functions, clazz, methodName, signature);
+  struct _jobject *result = env->functions->CallStaticObjectMethodV(&env->functions, clazz, methodID, args);
+  va_end(args);
+  return result
 }
 ```
 
