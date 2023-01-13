@@ -18,7 +18,7 @@ The following pseudocode snippets are **heavily** beautified. You may not be abl
 
 After we obtain the indy-deobfuscated sample, we are now able to analyze the `clinit` method of the class `ESKID` and find out how the DLL is loaded.
 
-### 1.Getting the OS type
+### 1.Recognization of runtime platform
 
 The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL
 
@@ -42,7 +42,7 @@ if (osType.contains("nux")) {
 
 However, its cross-platform functionality is actually deformed because of the absence of the DLL file `mac.dat` and `unix.dat` .
 
-### 2.Extracting and loading the DLL
+### 2.Extracting and loading
 
 Because of some restrictions, DLLs in the jar could not be loaded directly. Thus it's necessary to extract the DLL to a temporary file before loading it.
 
@@ -63,7 +63,7 @@ System.load(tempDllFile.getAbsolutePath());
 > All the pseudocode above are in the class `ESKID` .
 {: .prompt-tip }
 
-## Inside the DLL
+## Diving into the DLL
 
 In an attempt to learn more about the native methods in the DLL, we analysed some other methods under the package `com/loader/epsilon` . We were surprised that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyse deeper into the DLL itself.
 
