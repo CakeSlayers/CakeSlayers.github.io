@@ -6,7 +6,7 @@ authors: [UnfortuneCookie, Trdyun, Xiguajerry]
 img_path: /assets/eloader034-p1/
 ---
 
-Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It was also widely believed that the authentication and verification part of Epsilon is achieved in the DLL[^1]. So let's look inside the DLL and the related JVM classes to determine what role the DLL plays and find out whether we can fuck it out.
+Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. It was also widely believed that the authentication and verification part of Epsilon is achieved in the DLL[^1]. So let's look inside the DLL and the related JVM classes to determine what role the DLL plays and find out whether we can exploit it.
 
 ## Basic Information about the DLL
 
@@ -23,15 +23,13 @@ The first thing we want to figure out is the loading process of the DLL in JVM B
 
 ![stringSearchResult](stringSearchResult.png)
 
-It's so lucky that the dll's filename was not encrypted. Then we can find a suspicious class called `ESKID` and its static initizer "clinit".
+It's so lucky that the dll's filename was not encrypted. In this case we can find a suspicious class called `ESKID` and its static initizer `clinit` which contains the string.
 
 ## Indy[^2] in action
 
-The first evident obstacle we have to deal with is the `Invokedynamic Obfuscation`.
+After analysing `clinit` a bit, we can notice that there are many occurences of `invokedynamic` instructions.(We assumed that you are familiar with this instruction, or we recommend you to read this article first:https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic)
 
-For instance, look at the following `invokedynamic` instruction: 
-
-(We assumed that you are familiar with this instruction, or we recommend you to read this article first:https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic)
+For instance, look at the following `invokedynamic` instruction:
 
 ```java
 INVOKEDYNAMIC i(Ljava/lang/Object;Ljava/lang/Object;)Ljava/io/InputStream; [
@@ -45,13 +43,13 @@ ESKID.a(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invo
 ]
 ```
 
-So we move on to the method `a`, which is the bootstrap method, and start with the suspicious 4th integer argument.
+So following along the execution path, we see the `ESKID.a` method as the bootstrap method. This seems of interest so let’s also jump into that.
 
 ## The usage of the BSM[^3]
 
 ![HandleType](HandleType.png)
 
-Using Threadtear's powerful CFG[^4] (The graph above is optimized) , we can easily find out that the role of the 4th integer argument is to specify the invoke-type.
+Using Threadtear's powerful CFG[^4] (The graph above is optimized), we can easily find out that the role of the 4th integer argument is to specify the invoke-type.
 
 | Value | Invoke-Type |
 |:-----:|:-----------:|
@@ -82,7 +80,7 @@ So let's dig deeper into the method `ESKID.b` .
 
 ![decryption_process](decryption_process.png)
 
-Screenshot above is the last part of `ESKID.b`'s CFG. 
+Screenshot above is the last part of `ESKID.b`'s CFG.
 
 As your seen, there are plenty of annoying junk codes. But after analyzing the crucial part of the CFG above, we can still notice that there is a loop which traverses every `char` of the obfuscated string. Obviously this is simply the encrypting routine.
 
@@ -224,6 +222,7 @@ Screenshot above is a part of `ESKID` method.
 In Part 2 we'll dig into the details of the native DLL exploration and reveal the connections between Invokedynamic and JNI.
 
 ## Footnotes
+
 [^1]: So-called **`Native Obfsucation`**
 
 [^2]: Invokedynamic
