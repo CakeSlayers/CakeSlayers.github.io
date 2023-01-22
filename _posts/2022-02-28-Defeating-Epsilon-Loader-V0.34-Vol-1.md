@@ -1,7 +1,7 @@
 ---
-title: "Defeating Epsilon Loader V0.34 Vol. 1: The InvokeDynamic"
+title: "Defeating Epsilon Loader V0.34 Vol. 1: InvokeDynamic"
 date: 2022-02-28
-tags: [reverse-engineering, java, jni, indy]
+tags: [reverse-engineering, jvm, indy]
 authors: [UnfortuneCookie, Trdyun, Xiguajerry]
 img_path: /assets/eloader034-p1/
 ---
@@ -208,7 +208,7 @@ switch ((int) bsmArgs[3]) {
 ```
 
 You can download the complete source code of this Indy transformer via this link: [StaticIndyTransformer.java](/assets/eloader034-p1/StaticIndyTransformer.java)
-> YOU NEED TO ADD SimAnalyzer DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
+> YOU NEED TO ADD [SimAnalyzer](https://github.com/Col-E/SimAnalyzer) DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
 {: .prompt-danger }
 
 ## Final results
