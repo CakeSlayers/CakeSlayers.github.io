@@ -1,7 +1,7 @@
 ---
 title: "Defeating Epsilon Loader V0.34 Vol. 1: InvokeDynamic"
 date: 2022-02-28
-tags: [reverse-engineering, jvm, indy]
+tags: [reverse-engineering, jvm, indy, cryptography]
 authors: [UnfortuneCookie, Trdyun, Xiguajerry]
 img_path: /assets/eloader034-p1/
 ---
@@ -102,7 +102,9 @@ fun decrypt(enc: String): String {
 
 With the information gathered from the previous section, we can finally get rid of the annoying invokedynamics and reveal the true invocation.
 
-However, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with. So we have to write a custom transformer based on [java-deobfuscator](https://github.com/java-deobfuscator/deobfuscator) to automate the process.
+However, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
+
+So we have to write a custom transformer based on [java-deobfuscator](https://github.com/java-deobfuscator/deobfuscator) to automate the process.
 
 First of all, we find BSM and decryptor method.
 

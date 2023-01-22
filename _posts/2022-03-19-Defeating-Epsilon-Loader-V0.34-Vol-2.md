@@ -139,8 +139,9 @@ In JVM layer, the invocations were hidden by the `invokedynamic` instruction and
 ## Gathering data for further deobfuscation
 
 In order to recover the real call, we need to gather all the information about the actual calls from the JNI functions.
+
 So we write an IDApython script for this task.
-Download link: [TODO]
+Download link: [gen_proxy_info.py](/assets/eloader034-p2/gen_proxy_info.py)
 > YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST TO RUN THIS SCRIPT!
 {: .prompt-danger }
 
@@ -242,7 +243,7 @@ proxy_call_infos += {
 }
 ```
 
-Below is a small part of the result file --  `proxy_info.json` :
+Below is a small part of the result file --  [proxy_info.json](/assets/eloader034-p2/proxy_info.json) :
 
 ```json
 {
