@@ -57,7 +57,7 @@ Using Threadtear's powerful CFG[^4] (The graph above is optimized), we can easil
 | 2     | Static      |
 | 3     | Special     |
 
-Although "str1", "str2" and "str3" were obfuscated, but their functions can be easily recognized too.
+Although "str1", "str2" and "str3" were obfuscated, their functions can still be easily recognized:
 
 | str1 | target class's name       |
 |:----:|:-------------------------:|
@@ -66,7 +66,7 @@ Although "str1", "str2" and "str3" were obfuscated, but their functions can be e
 
 ## Algorithm
 
-After we have known the function of the BSM, it's time for us to reverse the algorithm and decrypt obfuscated strings.
+After we have known the function of the BSM, it's time for us to deal with the obfuscated strings.
 
 ```java
 <push the obfuscated string to stack>
@@ -74,17 +74,15 @@ INVOKESTATIC ESKID.b (Ljava/lang/String;)Ljava/lang/String;
 <working with the decoded string>
 ```
 
-Bytecode above is the pattern of string decryption. It's certain that `ESKID.b` is the method for string decryption in this case.
+Bytecode above is the pattern of the string decryption. It's certain that `ESKID.b` is the method for string decryption in this case.
 
-So let's dig deeper into the method `ESKID.b` .
+So let's dig deeper into the method `ESKID.b` :
 
 ![decryption_process](decryption_process.png)
 
 Screenshot above is the last part of `ESKID.b`'s CFG.
 
-As your seen, there are plenty of annoying junk codes. But after analyzing the crucial part of the CFG above, we can still notice that there is a loop which traverses every `char` of the obfuscated string. Obviously this is simply the encrypting routine.
-
-Before we get started to investigate this loader, we've found that the developers' of the loader use XOR to encrypt files when passing them through network (you can wait for further write-ups about that). In this case, we assume that the encryption algorithm is also XOR. In fact, it works. (lmfao)
+As your seen, there are plenty of junk codes. But after analyzing the crucial part of the CFG above, we can still observe that there is a loop which traverses every `char` of the obfuscated string. Obviously this is the encrypting routine.
 
 A simple kotlin *decryptor* implementation for this case would look like this:
 
@@ -104,7 +102,9 @@ fun decrypt(enc: String): String {
 
 With the information gathered from the previous section, we can finally get rid of the annoying invokedynamics and reveal the true invocation.
 
-Starting with nothing, we should find BSM and decryptor method first.
+However, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with. So we have to write a custom transformer based on [java-deobfuscator](https://github.com/java-deobfuscator/deobfuscator) to automate the process.
+
+First of all, we find BSM and decryptor method.
 
 ```java
 //find BSM
@@ -130,11 +130,9 @@ if (callDecryptor == null) {
 MethodNode decryptor = TransformerHelper.findMethodNode(classNode, callDecryptor.name, callDecryptor.desc);
 ```
 
-After some more analysis, we found that every obfuscated class has a unique XOR key despite the decryption algorithm remains the same. What's more, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
-
 During the previous section, we have known that the value of the top stack frame is the key when the last `ixor` instruction is about to be executed by JVM. Therefore, we can analyze how the stack changes and grab the top-stack value as the XOR key.
 
-The following code shows how we filter out the last XOR instruction using `Deobfuscator`'s `InstructionMatcher`
+So the following code shows how we filter out the last XOR instruction using `Deobfuscator`'s `InstructionMatcher` :
 
 ```java
 final InstructionPattern algorithmPattern = new InstructionPattern(
@@ -152,7 +150,7 @@ if (lastIxor == null) {
 }
 ```
 
-Then we analyzed the frame statically using the power of SimAnalyzer and get the XOR key from the top of the stack:
+Then we analyzed the frame statically using the power of [SimAnalyzer](https://github.com/Col-E/SimAnalyzer) and get the XOR key from the top of the stack:
 
 ```java
 SimInterpreter interpreter = new SimInterpreter();
@@ -210,6 +208,8 @@ switch ((int) bsmArgs[3]) {
 ```
 
 You can download the complete source code of this Indy transformer via this link: [StaticIndyTransformer.java](/assets/eloader034-p1/StaticIndyTransformer.java)
+> YOU NEED TO ADD SimAnalyzer DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
+{: .prompt-danger }
 
 ## Final results
 
