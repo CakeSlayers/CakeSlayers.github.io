@@ -18,7 +18,7 @@ timezone: Asia/Shanghai
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: HorizonLN                          # the main title
+title: CakeSlayers                          # the main title
 
 tagline: Look! A way to crack!   # it will display as the sub-title
 
@@ -26,10 +26,10 @@ tagline: Look! A way to crack!   # it will display as the sub-title
 
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
-url: 'https://HorizonLN.github.io'
+url: 'https://CakeSlayers.github.io'
 
 github:
-  username: HorizonLN             # change to your github username
+  username: CakeSlayers             # change to your github username
 
 #twitter:
 #  username:             # change to your twitter username
@@ -37,10 +37,10 @@ github:
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: HorizonLN
-  email: HorizonLN@outlook.com             # change to your email address
+  name: CakeSlayers
+  email:           # change to your email address
   links:
-    - https://github.com/HorizonLN       # change to your github homepage
+    - https://github.com/CakeSlayers       # change to your github homepage
     - https://github.com/username       # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
