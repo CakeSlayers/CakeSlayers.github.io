@@ -14,6 +14,15 @@ In the last article we deobfuscated the Indys and reveal the "real invocation", 
 
 The following pseudocode snippets are **heavily** beautified. You may not be able to instantly recognize some of these parts; lots of junk code and algorithms are unrolled. But that doesn’t really matter, as when you finish reading about this kind of protection, you will have a field day breaking it (=
 
+## Basic Information About The DLL
+
+| Name            |                                 |
+|:---------------:|:-------------------------------:|
+| Arch            | x86_64                          |
+| Compiler        | Visual C/C++(19.00.30034)[C++]  |
+| Packed?         | NO                              |
+| Virus Detection | NO(Using Virus-Total & Intezer) |
+
 ## DLL loading process
 
 After we obtain the indy-deobfuscated sample, we are now able to analyze the `clinit` method of the class `ESKID` and find out how the DLL is loaded.
@@ -44,7 +53,7 @@ However, its cross-platform functionality is actually deformed because of the ab
 
 ### 2.Extracting and loading
 
-Because of some restrictions, DLLs in the jar could not be loaded directly. Thus it's necessary to extract the DLL to a temporary file before loading it.
+Because of some technical restrictions, the DLLs in the jar could not be loaded directly. Thus it's necessary to extract the DLL as a temporary file before loading it.
 
 ```java
 File tempDllFile = File.createTempFile("eskidontop", ".dat");
@@ -65,7 +74,7 @@ System.load(tempDllFile.getAbsolutePath());
 
 ## Diving into the DLL
 
-In an attempt to learn more about the native methods in the DLL, we analysed some other methods under the package `com/loader/epsilon` . We were surprised that almost every invocation which has a real role was just disappeared. What's more, we could only find invocations to the native methods. So it's time to analyse deeper into the DLL itself.
+In an attempt to learn more about the native methods in the DLL, we analysed some of the other methods under the package `com/loader/epsilon` . To our surprise, most of the invocations were pointed to the native methods. So it's time to analyse deeper into the DLL itself.
 
 ### Thunk function
 
@@ -269,16 +278,18 @@ Below is a small part of the result file --  [proxy_info.json](/assets/eloader0
 }
 ```
 
-## Winner winner chicken dinner!
+## Winner winner chicken dinner
 
 With the data we extracted, we can write another custom transformer to deobfuscate them automatically. The deobfuscation process is like the diagram below.
 
-![未找到图片：diff.png](diff.png "未找到图片：diff.png")Here's the source code: [JniProxyTransformer.java](/assets/eloader034-p2/JniProxyTransformer.java)
+![diff](diff.png)
+
+Here's the source code: [JniProxyTransformer.java](/assets/eloader034-p2/JniProxyTransformer.java)
 > YOU NEED TO ADD [Gson](https://github.com/google/gson) DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
 {: .prompt-danger }
 
 The only thing we want to highlight is how we determine whether the invocation type is `INVOKEINTERFACE`.
-Actually the workaround is simple, we just grab the target `clazz`'s `classNode` from the classpath and get its access property:
+Actually the workaround is simple, we can just grab the target `clazz`'s `classNode` from the classpath and get that from its access property:
 
 ```java
 int opcode;
@@ -305,9 +316,7 @@ The GIF below is the real thing AntiLeak will do once triggered:
 
 ![just a meme](anti_leak_IRL.gif)
 
-## Credit
-
-Thanks @smallshen for hijacking our PCs using his POWERFUL AntiLeak
+@smallshen hijacking our PCs using his POWERFUL AntiLeak
 
 ![copyrighted-jar-protected-by-smallshen](copyrighted-jar-protected-by-smallshen.png)
 
@@ -316,6 +325,8 @@ Thanks Juanye for encouraging us:
 ![juanye_laughs](juanye_laughs.png)
 
 ![juanye_laughs_p2](juanye_laughs_p2.png)
+
+## Credits
 
 Thanks Six for enlightening us:
 
