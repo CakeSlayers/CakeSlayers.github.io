@@ -23,17 +23,17 @@ import json
 
 proxy_call_infos = {}
 for func in Functions():
-    # filter out non-JNI functions
+    # filter out non-native methods
     if re.match(r"Java_ESKID_(.*)_0", get_func_name(func)) == None:
         continue
 
-    # extract clazz,method,signature from lea*3 pattern in JNI functions
+    # extract clazz,method,signature from lea*3 pattern in native methods
     leaList = list(
         filter(lambda addr: print_insn_mnem(addr) == "lea", list(FuncItems(func)))
     )
     if len(leaList) != 3:
         print(
-            "[ERROR] JNI function %s doesn't match lea*3 pattern!"
+            "[ERROR] native method %s doesn't match lea*3 pattern!"
             % (get_func_name(func))
         )
         continue
@@ -56,16 +56,16 @@ for func in Functions():
     )
     if len(callThunk) != 1:
         print(
-            "[ERROR] could not find JMP/CALL thunk function in JNI function %s"
+            "[ERROR] could not find JMP/CALL thunk function in native method %s"
             % (get_func_name(func))
         )
         continue
     thunkFuncAddr = get_operand_value(callThunk[0], 0)
 
-    # check whether the thunk function has JMP to the JNI-helper function
+    # check whether the thunk function has JMP to the inlined JNI function
     if print_insn_mnem(thunkFuncAddr) != "jmp":
         print(
-            "[ERROR] thunk function %s doesn't have jmp to JNI-helper function!"
+            "[ERROR] thunk function %s doesn't have jmp to the inlined JNI function!"
             % (get_func_name(func))
         )
         continue
@@ -77,16 +77,16 @@ for func in Functions():
         call    [r10+JNINativeInterface_.Get...MethodID]
         call    [r10+JNINativeInterface_.Call...MethodV]
         
-        Step:
-        1.Get the 3th call's member name in JNI structure.
-        2.Determine invoke-type info by checking whether the name contains "Static". """
+        Process:
+        1.Get the 3th call's member function name in JNI structure.
+        2.Determine the invoke-type by checking whether the name contains "Static". """
     JniHelperFuncItems = FuncItems(get_operand_value(thunkFuncAddr, 0))
     JNIcalls = list(
         filter(lambda addr: print_insn_mnem(addr) == "call", list(JniHelperFuncItems))
     )
     if len(JNIcalls) != 3:
         print(
-            "[ERROR] JNI helper function %s doesn't match JNI-call*3 pattern!"
+            "[ERROR] Inlined JNI function %s doesn't match JNI-call*3 pattern!"
             % (get_func_name(func))
         )
         continue

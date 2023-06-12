@@ -25,9 +25,9 @@ The following pseudocode snippets are **heavily** beautified. You may not be abl
 
 ## DLL loading process
 
-After we obtain the indy-deobfuscated sample, we are now able to analyze the `clinit` method of the class `ESKID` and find out how the DLL is loaded.
+With the indy-deobfuscated sample, we are now able to analyze the `clinit` method of the class `ESKID` and find out how the DLL is loaded.
 
-### 1.Recognization of runtime platform
+### 1.OS identification
 
 The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL
 
@@ -78,7 +78,7 @@ In an attempt to learn more about the native methods in the DLL, we analysed som
 
 ### Thunk function
 
-We choose a random JNI function `Java_ESKID_AwUlqtUfLk` for our initial analyze.
+We choose the native method `Java_ESKID_AwUlqtUfLk` for our initial analyze.
 
 ![thunk_func](thunk_func.png)
 
@@ -107,20 +107,18 @@ Then we followed the jump to the function `Java_ESKID_AwUlqtUfLk_0` :
 .text:0000000180009EE7 Java_ESKID_AwUlqtUfLk_0 endp
 ```
 
-Subsequently we observe 3 strings as arguments for the **single** `call`. we can obviously know that these plain strings are class name, method name and signature.
+Subsequently we can observe 3 strings as arguments for the **single** `call`. we can assume that these plain strings are class name, method name and signature.
 
 ### Another Thunk Function
 
-In turn we seek to the function `j_eCallStaticObjectMethodV` .
+In turn we seek to the function `j_CallStaticObjectMethod` which turns out to be another thunk function which jumps to the function `CallStaticObjectMethod` .
 
-It turns out that `j_eCallStaticObjectMethodV` is another thunk function which jumps to the function `eCallStaticObjectMethodV` .
-
-### JNI helper Function
+### Inlined JNI function 
 
 The pseudocode of the function looks like this:
 
 ```c
-jobject eCallStaticObjectMethodV(JNIEnv_ *env, const char *className, const char *methodName, const char *signature, ...)
+jobject CallStaticObjectMethod(JNIEnv_ *env, const char *className, const char *methodName, const char *signature, ...)
 {
   struct _jobject *clazz; // rbx
   struct _jmethodID *methodID; // rax
@@ -133,11 +131,11 @@ jobject eCallStaticObjectMethodV(JNIEnv_ *env, const char *className, const char
 }
 ```
 
-From this pseudocode we can recognize this function as JNI-helper function. Its role is to assist developers to call JNI methods comfortably.
+From this pseudocode we can recognize this function as an inlined JNI function(source: [jni.h#L1351](https://github.com/openjdk/jdk8u-dev/blob/6244292d28e1cddcc70bc4dbf98adad13fe1e3d7/jdk/src/share/javavm/export/jni.h#L1351)) and its role is assisting developers to call JNI methods comfortably.
 
-### Summary
+### Conclusion
 
-The functionalities of all the JNI functions are the same: they were used for hiding the invocations to the JVM methods.
+The functionalities of all the native methods are the same: they were used for making invocations to the JVM methods.
 
 The whole life-cycle of the obfuscated JVM method invocations can be summarize as the graph below:
 
@@ -149,16 +147,16 @@ In JVM layer, the invocations were hidden by the `invokedynamic` instruction and
 
 In order to recover the real call, we need to gather all the information about the actual calls from the JNI functions.
 
-So we write an IDApython script for this task.
+So we can write an IDApython script for this task.
 Download link: [gen_proxy_info.py](/assets/eloader034-p2/gen_proxy_info.py)
 > YOU NEED TO ADD JNI STRUCTURE IN IDA FIRST TO RUN THIS SCRIPT!
 {: .prompt-danger }
 
-We started first by filtering out JNI functions, IDA's powerful auto-rename feature has already skipped the first thuck function for us, so we just pick the functions which end with `_0` :
+We started first by filtering out JNI functions, IDA's powerful auto-rename feature has already skipped the first thuck function for us, so we can just pick the functions which end with `_0` :
 
 ```python
 for func in Functions():
-    # filter out non-JNI functions
+    # filter out non-native methods
     if re.match(r"Java_ESKID_(.*)_0", get_func_name(func)) == None:
         continue
 ```
@@ -171,7 +169,7 @@ leaList = list(
 )
 if len(leaList) != 3:
     print(
-        "[ERROR] JNI function %s doesn't match lea*3 pattern!"
+        "[ERROR] native method %s doesn't match lea*3 pattern!"
         % (get_func_name(func))
     )
     continue
@@ -197,16 +195,16 @@ callThunk = list(
 )
 if len(callThunk) != 1:
     print(
-        "[ERROR] could not find JMP/CALL thunk function in JNI function %s"
+        "[ERROR] could not find JMP/CALL thunk function in native method %s"
         % (get_func_name(func))
     )
     continue
 thunkFuncAddr = get_operand_value(callThunk[0], 0)
 
-# check whether the thunk function has JMP to the JNI-helper function
+# check whether the thunk function has JMP to the inlined JNI function
     if print_insn_mnem(thunkFuncAddr) != "jmp":
         print(
-            "[ERROR] thunk function %s doesn't have jmp to JNI-helper function!"
+            "[ERROR] thunk function %s doesn't have jmp to the inlined JNI function!"
             % (get_func_name(func))
         )
         continue
@@ -221,7 +219,7 @@ JNIcalls = list(
 )
 if len(JNIcalls) != 3:
     print(
-        "[ERROR] JNI helper function %s doesn't match JNI-call*3 pattern!"
+        "[ERROR] Inlined JNI function %s doesn't match JNI-call*3 pattern!"
         % (get_func_name(func))
     )
     continue
@@ -300,7 +298,7 @@ if (classpath.get(proxyInfo.get("clazz")).access == Opcodes.ACC_INTERFACE) {
 }
 ```
 
-We can combine part1 and part2 together to form the complete graph:
+We can combine part1 and part2 together to form a complete graph:
 
 ![overview](overview.png)
 
