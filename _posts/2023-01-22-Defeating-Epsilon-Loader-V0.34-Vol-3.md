@@ -91,6 +91,9 @@ The calculation rules are as follow:
 * If the bits at the ith position are the same we put 0 at that position.
 * Else if the bits at the ith position are different we put 1 at that position.
 
-As the final decryption result we need is a single byte, the higher bits above 8-bits are useless.
+It turns out that even without the higher bits, the calculation process of the lowest 8-bits are still unaffected because of the bit by bit calculation rule.
+
+As the final decryption result we need is a single byte, the only necessity is the lowest 8-bits and the higher bits above 8 are useless.
+
 What a tragic for eridani club  ^ ^
 ![meme](meme.jpg)
