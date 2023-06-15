@@ -1,18 +1,18 @@
 ---
 title: "Defeating Epsilon Loader V0.34 Vol. 2: JNI Protection"
 date: 2022-03-19
-tags: [reverse-engineering, jvm, jni]
-authors: [UnfortuneCookie, Trdyun, Xiguajerry]
+tags: [reverse-engineering, jvm, jni, deobfuscation]
+authors: [BotDebug, Trdyun, Xiguajerry]
 img_path: /assets/eloader034-p2/
 ---
-
-## Intro
-
-In the last article we deobfuscated the Indys and reveal the "real invocation", in this post we will focus on analyzing both the related bytecode and the DLL to reveal the truth.
 
 ## Disclaimer
 
 The following pseudocode snippets are **heavily** beautified. You may not be able to instantly recognize some of these parts; lots of junk code and algorithms are unrolled. But that doesn’t really matter, as when you finish reading about this kind of protection, you will have a field day breaking it (=
+
+## Intro
+
+In the last article we deobfuscated the Indys and reveal the "real invocation", in this post we will focus on analyzing both the related bytecode and the DLL to reveal the truth.
 
 ## Basic Information About The DLL
 
@@ -29,7 +29,7 @@ With the indy-deobfuscated sample, we are now able to analyze the `clinit` metho
 
 ### 1.OS identification
 
-The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL
+The DLL loading process starts by trying to get system properties to determine the type of your operating system and grab the proper OS-specific DLL.
 
 This is an abstract of their implementation:
 
@@ -53,7 +53,9 @@ However, its cross-platform functionality is actually deformed because of the ab
 
 ### 2.Extracting and loading
 
-Because of some technical restrictions, the DLLs in the jar could not be loaded directly. Thus it's necessary to extract the DLL as a temporary file before loading it.
+Because of some technical restrictions, the DLLs in the jar could not be loaded directly. 
+
+Thus it's necessary to extract the DLL as a temporary file before loading it.
 
 ```java
 File tempDllFile = File.createTempFile("eskidontop", ".dat");
@@ -74,7 +76,9 @@ System.load(tempDllFile.getAbsolutePath());
 
 ## Diving into the DLL
 
-In an attempt to learn more about the native methods in the DLL, we analysed some of the other methods under the package `com/loader/epsilon` . To our surprise, most of the invocations were pointed to the native methods. So it's time to analyse deeper into the DLL itself.
+In an attempt to learn more about the native methods in the DLL, we analysed some of the other methods under the package `com/loader/epsilon` . 
+
+To our surprise, most of the invocations were pointed to the native methods. So it's time to analyse the DLL.
 
 ### Thunk function
 
@@ -82,7 +86,7 @@ We choose the native method `Java_ESKID_AwUlqtUfLk` for our initial analyze.
 
 ![thunk_func](thunk_func.png)
 
-The IDA has already marked this function as thunk function because it only has one instruction.
+The IDA has already marked this function as thunk function because it only has a single `jmp` instruction.
 
 ### 3 suspicious string arguments
 
@@ -107,7 +111,9 @@ Then we followed the jump to the function `Java_ESKID_AwUlqtUfLk_0` :
 .text:0000000180009EE7 Java_ESKID_AwUlqtUfLk_0 endp
 ```
 
-Subsequently we can observe 3 strings as arguments for the **single** `call`. we can assume that these plain strings are class name, method name and signature.
+Subsequently we can observe 3 strings as arguments for the **single** `call`. 
+
+We can assume that these plain strings are class name, method name and signature.
 
 ### Another Thunk Function
 
@@ -141,7 +147,9 @@ The whole life-cycle of the obfuscated JVM method invocations can be summarize a
 
 ![realCall](realCall.png)
 
-In JVM layer, the invocations were hidden by the `invokedynamic` instruction and its invocation to the JNI method will be resolved during runtime. Finally the JNI functions in the DLL invoke the real target java method.
+In JVM layer, the invocations were hidden by the `invokedynamic` instruction and its invocation to the JNI method will be resolved during runtime. 
+
+Finally the JNI functions in the DLL invoke the real target java method.
 
 ## Gathering data for further deobfuscation
 
@@ -183,7 +191,9 @@ for leaAddr in leaList:
         method = string
 ```
 
-Now the JNI function is about to call the JNI-helper function to invoke the real target jvm method, however there's another thuck function which blocks our way, so we have to grab the address of the thunk function first:
+Now the JNI function is about to call the JNI-helper function to invoke the real target jvm method.
+
+However there's another thuck function which blocks our way, so we have to grab the address of the thunk function first:
 
 ```python
 callThunk = list(
@@ -278,7 +288,9 @@ Below is a small part of the result file --  [proxy_info.json](/assets/eloader0
 
 ## Winner winner chicken dinner
 
-With the data we extracted, we can write another custom transformer to deobfuscate them automatically. The deobfuscation process is like the diagram below.
+With the data we extracted, we can write another custom transformer to deobfuscate them automatically.
+
+The deobfuscation process is like the diagram below:
 
 ![diff](diff.png)
 
@@ -287,6 +299,7 @@ Here's the source code: [JniProxyTransformer.java](/assets/eloader034-p2/JniProx
 {: .prompt-danger }
 
 The only thing we want to highlight is how we determine whether the invocation type is `INVOKEINTERFACE`.
+
 Actually the workaround is simple, we can just grab the target `clazz`'s `classNode` from the classpath and get that from its access property:
 
 ```java
@@ -314,7 +327,7 @@ The GIF below is the real thing AntiLeak will do once triggered:
 
 ![just a meme](anti_leak_IRL.gif)
 
-@smallshen hijacking our PCs using his POWERFUL AntiLeak
+@smallshen hijacked our PCs using his POWERFUL AntiLeak:
 
 ![copyrighted-jar-protected-by-smallshen](copyrighted-jar-protected-by-smallshen.png)
 
@@ -322,10 +335,4 @@ Thanks Juanye for encouraging us:
 
 ![juanye_laughs](juanye_laughs.png)
 
-![juanye_laughs_p2](juanye_laughs_p2.png)
-
-## Credits
-
-Thanks Six for enlightening us:
-
-![six_enlightenment](six_enlightenment.png)
+![未找到图片：juanye_laughs_p2.png](juanye_laughs_p2.png "未找到图片：juanye_laughs_p2.png")

@@ -1,0 +1,25 @@
+<mxfile host="Electron" modified="2023-06-15T01:17:31.097Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.3.7 Chrome/112.0.5615.204 Electron/24.5.0 Safari/537.36" etag="ZYd2UOW8LYVldvoDBjth" version="21.3.7" type="device">
+  <diagram name="第 1 页" id="HyBm2bx3tJp3RQZI_EFL">
+    <mxGraphModel dx="1323" dy="1287" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="KE2MwYjzFlTmtxSE0v7F-2" value="&lt;font style=&quot;font-size: 25px;&quot;&gt;&lt;span style=&quot;background-color: rgb(51, 153, 255);&quot;&gt;&amp;lt;COMPUTERNAME&amp;gt;&amp;lt;HOMEDRIVE&amp;gt;&lt;/span&gt;&lt;span style=&quot;background-color: rgb(255, 0, 0);&quot;&gt;&amp;lt;os.name&amp;gt;&amp;lt;os.arch&amp;gt;&amp;lt;os.version&amp;gt;&lt;/span&gt;&lt;span style=&quot;background-color: rgb(0, 204, 102);&quot;&gt;&amp;lt;availableProcessors&amp;gt;&lt;/span&gt;&lt;span style=&quot;background-color: rgb(51, 153, 255);&quot;&gt;&amp;lt;PROCESSOR_LEVEL&amp;gt;&amp;lt;PROCESSOR_REVISION&amp;gt;&amp;lt;PROCESSOR_IDENTIFIER&amp;gt;&amp;lt;PROCESSOR_ARCHITECTURE&amp;gt;&amp;lt;PROCESSOR_ARCHITEW6432&amp;gt;&amp;lt;NUMBER_OF_PROCESSORS&amp;gt;&lt;/span&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=30;" vertex="1" parent="1">
+          <mxGeometry x="35" y="740" width="525" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="KE2MwYjzFlTmtxSE0v7F-3" value="&lt;font color=&quot;#3399ff&quot; style=&quot;font-size: 23px;&quot;&gt;System.getenv()&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=23;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="230" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="KE2MwYjzFlTmtxSE0v7F-4" value="&lt;font color=&quot;#ff0000&quot; style=&quot;font-size: 23px;&quot;&gt;System.getProperty()&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=23;" vertex="1" parent="1">
+          <mxGeometry x="40" y="560" width="230" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="KE2MwYjzFlTmtxSE0v7F-9" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="35" y="527" width="480" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="KE2MwYjzFlTmtxSE0v7F-5" value="&lt;font color=&quot;#00cc66&quot; style=&quot;font-size: 23px;&quot;&gt;Runtime.getRuntime().availableProcessors()&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=23;" vertex="1" parent="1">
+          <mxGeometry x="40" y="600" width="230" height="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

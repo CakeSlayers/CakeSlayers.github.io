@@ -1,0 +1,13 @@
+<mxfile host="Electron" modified="2023-06-14T10:24:38.717Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.3.7 Chrome/112.0.5615.204 Electron/24.5.0 Safari/537.36" etag="A3J3FfXDWTSiq-tmCM87" version="21.3.7" type="device">
+  <diagram name="第 1 页" id="fT33NdWy65UwMCLJ-UJ0">
+    <mxGraphModel dx="794" dy="788" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kFtwM2q5KX7SH1nFHp4b-1" value="&lt;font color=&quot;#ffff66&quot; style=&quot;font-size: 19px;&quot;&gt;[ACCOUNT]&lt;/font&gt;&lt;font color=&quot;#00ff00&quot; style=&quot;font-size: 19px;&quot;&gt;&amp;lt;account name&amp;gt;&lt;/font&gt;:&lt;font color=&quot;#ff0000&quot; style=&quot;font-size: 19px;&quot;&gt;&amp;lt;account password&amp;gt;&lt;/font&gt;:&lt;font color=&quot;#b266ff&quot; style=&quot;font-size: 19px;&quot;&gt;&amp;lt;hwid&amp;gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=19;" vertex="1" parent="1">
+          <mxGeometry x="140" y="450" width="510" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
