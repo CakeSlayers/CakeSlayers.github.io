@@ -2,13 +2,13 @@
 title: "Defeating Epsilon Loader V0.34 Vol. 1: InvokeDynamic"
 date: 2022-02-28
 tags: [reverse-engineering, jvm, indy, cryptography]
-authors: [BotDebug, Trdyun, Xiguajerry]
+authors: [BotDebug, Trdyun, SagiriXiguajerry]
 img_path: /assets/eloader034-p1/
 ---
 
-Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time. 
+Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time.
 
-It was also widely believed that the authentication and verification part of Epsilon is achieved in the DLL[^1]. 
+It was also widely believed that the authentication and verification part of Epsilon is achieved in the DLL[^1].
 
 So let's look inside the DLL and the related JVM classes to determine what role the DLL plays and find out the way to exploit it.
 
@@ -22,7 +22,7 @@ It's so lucky that the dll's filename was not encrypted. Taking advantages of th
 
 ## Indy[^2] In Action
 
-After analysing `clinit` a bit, we can observe that there are many occurences of `invokedynamic` instructions. (More information about `invokedynamic`: https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic)
+After analysing `clinit` a bit, we can observe that there are many occurences of `invokedynamic` instructions. (More information about `invokedynamic`: <https://blogs.oracle.com/javamagazine/post/understanding-java-method-invocation-with-invokedynamic>)
 
 For instance, look at the following `invokedynamic` instruction:
 
@@ -71,7 +71,7 @@ INVOKESTATIC ESKID.b (Ljava/lang/String;)Ljava/lang/String;
 <working with the decoded string>
 ```
 
-Bytecode above is the pattern of the string decryption. 
+Bytecode above is the pattern of the string decryption.
 
 It's certain that `ESKID.b` is the method for string decryption in this case.
 
@@ -81,9 +81,9 @@ Then we can take a glance at the method `ESKID.b` :
 
 (Screenshot above is the last part of `ESKID.b`'s CFG.)
 
-As you can see, there are plenty of junk codes. 
+As you can see, there are plenty of junk codes.
 
-But after analyzing the crucial part of the CFG above, we can assume that there is a loop which traverses every `char` of the obfuscated string. 
+But after analyzing the crucial part of the CFG above, we can assume that there is a loop which traverses every `char` of the obfuscated string.
 
 That loop turns out to be the encrypting routine.
 
@@ -105,7 +105,7 @@ fun decrypt(enc: String): String {
 
 With the information gathered from the previous section, we can finally get rid of the annoying invokedynamics and reveal the true invocation.
 
-However, Every obfuscated class has a unique XOR key despite of the same decryption algorithm. 
+However, Every obfuscated class has a unique XOR key despite of the same decryption algorithm.
 
 What's worse, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
 
@@ -137,7 +137,7 @@ if (callDecryptor == null) {
 MethodNode decryptor = TransformerHelper.findMethodNode(classNode, callDecryptor.name, callDecryptor.desc);
 ```
 
-During the previous section, we have known that the value of the top stack frame is the key when the last `ixor` instruction is about to be executed by JVM. 
+During the previous section, we have known that the value of the top stack frame is the key when the last `ixor` instruction is about to be executed by JVM.
 
 Therefore, we can analyze how the stack changes and grab the top-stack value as the XOR key.
 

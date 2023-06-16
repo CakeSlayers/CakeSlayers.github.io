@@ -2,7 +2,7 @@
 title: "Defeating Epsilon Loader V0.34 Vol. 2: JNI Protection"
 date: 2022-03-19
 tags: [reverse-engineering, jvm, jni, deobfuscation]
-authors: [BotDebug, Trdyun, Xiguajerry]
+authors: [BotDebug, Trdyun, SagiriXiguajerry]
 img_path: /assets/eloader034-p2/
 ---
 
@@ -53,7 +53,7 @@ However, its cross-platform functionality is actually deformed because of the ab
 
 ### 2.Extracting and loading
 
-Because of some technical restrictions, the DLLs in the jar could not be loaded directly. 
+Because of some technical restrictions, the DLLs in the jar could not be loaded directly.
 
 Thus it's necessary to extract the DLL as a temporary file before loading it.
 
@@ -76,7 +76,7 @@ System.load(tempDllFile.getAbsolutePath());
 
 ## Diving into the DLL
 
-In an attempt to learn more about the native methods in the DLL, we analysed some of the other methods under the package `com/loader/epsilon` . 
+In an attempt to learn more about the native methods in the DLL, we analysed some of the other methods under the package `com/loader/epsilon`.
 
 To our surprise, most of the invocations were pointed to the native methods. So it's time to analyse the DLL.
 
@@ -111,7 +111,7 @@ Then we followed the jump to the function `Java_ESKID_AwUlqtUfLk_0` :
 .text:0000000180009EE7 Java_ESKID_AwUlqtUfLk_0 endp
 ```
 
-Subsequently we can observe 3 strings as arguments for the **single** `call`. 
+Subsequently we can observe 3 strings as arguments for the **single** `call`.
 
 We can assume that these plain strings are class name, method name and signature.
 
@@ -119,7 +119,7 @@ We can assume that these plain strings are class name, method name and signature
 
 In turn we seek to the function `j_CallStaticObjectMethod` which turns out to be another thunk function which jumps to the function `CallStaticObjectMethod` .
 
-### Inlined JNI function 
+### Inlined JNI function
 
 The pseudocode of the function looks like this:
 
@@ -147,7 +147,7 @@ The whole life-cycle of the obfuscated JVM method invocations can be summarize a
 
 ![realCall](realCall.png)
 
-In JVM layer, the invocations were hidden by the `invokedynamic` instruction and its invocation to the JNI method will be resolved during runtime. 
+In JVM layer, the invocations were hidden by the `invokedynamic` instruction and its invocation to the JNI method will be resolved during runtime.
 
 Finally the JNI functions in the DLL invoke the real target java method.
 
@@ -335,4 +335,4 @@ Thanks Juanye for encouraging us:
 
 ![juanye_laughs](juanye_laughs.png)
 
-![未找到图片：juanye_laughs_p2.png](juanye_laughs_p2.png "未找到图片：juanye_laughs_p2.png")
+![juanye_laughs_p2.png](juanye_laughs_p2.png)
