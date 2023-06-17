@@ -49,7 +49,7 @@ if (osType.contains("nux")) {
 }
 ```
 
-However, its cross-platform functionality is actually deformed because of the absence of the DLL file `mac.dat` and `unix.dat` .
+However, its cross-platform functionality is actually **deformed** because of the absence of the DLL file `mac.dat` and `unix.dat` .
 
 ### 2.Extracting and loading
 
@@ -317,22 +317,12 @@ We can combine part1 and part2 together to form a complete graph:
 
 ## Memes
 
-The DLL was backdoored:
+The DLL has backdoor:
 
 ![dll_backdoor](dll_backdoor.png)
 
 ![ez_botdebug_p2](ez_botdebug_p2.png)
 
-The GIF below is the real thing AntiLeak will do once triggered:
-
-![just a meme](anti_leak_IRL.gif)
-
 @smallshen hijacked our PCs using his POWERFUL AntiLeak:
 
-![copyrighted-jar-protected-by-smallshen](copyrighted-jar-protected-by-smallshen.png)
-
-Thanks Juanye for encouraging us:
-
-![juanye_laughs](juanye_laughs.png)
-
-![juanye_laughs_p2.png](juanye_laughs_p2.png)
+![just a meme](anti_leak_IRL.gif)

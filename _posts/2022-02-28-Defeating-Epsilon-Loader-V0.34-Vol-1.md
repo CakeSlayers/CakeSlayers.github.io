@@ -105,7 +105,7 @@ fun decrypt(enc: String): String {
 
 With the information gathered from the previous section, we can finally get rid of the annoying invokedynamics and reveal the true invocation.
 
-However, Every obfuscated class has a unique XOR key despite of the same decryption algorithm.
+However, Every obfuscated class has a **unique** XOR key despite of the same decryption algorithm.
 
 What's worse, the XOR key is protected by junk code. That's a stumbling block we have to deal with.
 
@@ -216,7 +216,7 @@ switch ((int) bsmArgs[3]) {
 }
 ```
 
-You can download the complete source code of this Indy transformer via this link: [StaticIndyTransformer.java](/assets/eloader034-p1/StaticIndyTransformer.java)
+You can download the complete source code of this Indy transformer via this: [StaticIndyTransformer.java](/assets/eloader034-p1/StaticIndyTransformer.java)
 > YOU NEED TO ADD [SimAnalyzer](https://github.com/Col-E/SimAnalyzer) DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
 {: .prompt-danger }
 

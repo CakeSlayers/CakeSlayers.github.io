@@ -18,12 +18,12 @@ So today we’ll go into details about how we broke their encryption.
 
 ## Analysis of Authentication Process
 
-If you have ever tried to capture epsilon loader's network packets, you might be surprised by its "plain-text" client-to-server packets and encrypted server-to-client packets.
+If you have ever tried to capture epsilon loader's network packets, you might be surprised by its **"plain-text"** client-to-server packets and **encrypted** server-to-client packets.
 
-As a result, the content of the client-to-server packet except the hwid string can be parsed in ease. Just as the image below:
+As a result, the content of the client-to-server packet **except** the hwid string can be parsed in ease. Just as the image below:
 ![client-to-server.png](client-to-server.png)
 
-Once we look at the related code (too long to put in the article TAT ) in the `$$$$$$$$ESKID$$$$$$$$$c.b()` we figured that the hwid string is composed of several system specifications, given by `System.getenv()`, `System.getProperty()` and `Runtime.getRuntime().availableProcessors()`:
+Once we look at the related code in the `$$$$$$$$ESKID$$$$$$$$$c.b()`, we can figured that the hwid string is composed of several system specifications, given by `System.getenv()`, `System.getProperty()` and `Runtime.getRuntime().availableProcessors()`:
 ![hwid.png](hwid.png)
 
 Finally, the hwid string was encrypted by multiple ciphers, such as `sha-256`, `sha-1`, `sha-512`.
@@ -61,9 +61,11 @@ Consequently, they should have some important roles.
 Rolling down just a little we could find pseudocode like this:
 ![form_final_key](form_final_key.png)
 
-Voila! We can see that it is querying every byte of the encrypted file and doing xor calculations to every byte, just like a decryption process isn't it?
+Voila! We can see that it is traversing every byte of the encrypted file and doing xor calculations to every byte, just like a decryption process isn't it?
 
-What's more, `unknown1` and `unknown2` are found participating in forming the final xor key! Now we can rename them into `xor_key1` and `xor_key2`.
+What's more, `unknown1` and `unknown2` are found participating in forming the final xor key!
+
+Now we can rename them into `xor_key1` and `xor_key2`.
 
 With the information we gathered, the whole server-to-client packet can be parsed in ease:
 ![parsed_packet](parsed_packet.png)
@@ -77,7 +79,7 @@ The whole process can be summarized as this diagram:
 
 At the early stage of our analysis, we tried to brute-force the XOR key in order to bypass the most annoying process and minimize the time expense.
 
-Despite of the same result, the XOR key we brute-forced out was a single byte: 0xfd, instead of the 32-bit integer 0x3e8fd that we calculated from the network packets later.
+Despite of the same result, the XOR key we brute-forced out was a single byte: **0xfd**, instead of the 32-bit integer **0x3e8fd** that we calculated from the network packets later.
 
 That anomaly aroused our interest in finding its root cause, so we carefully checked the class decryption process and found something wrong with the type:
 ![data_loss](data_loss.png)
@@ -91,7 +93,7 @@ As a result, all but the 8 lowest bits were discarded in the narrowing primitive
 What about the xor operation?
 ![xor_operation.png](xor_operation.png)
 
-Xor operation happens in binary level and calculates bit by bit.
+Xor operation happens in **binary level** and calculates **bit by bit**.
 
 The calculation rules are as follow:
 
@@ -100,7 +102,19 @@ The calculation rules are as follow:
 
 It turns out that even without the higher bits, the calculation process of the lowest 8-bits are still unaffected because of the bit-by-bit calculation rule.
 
-As the final decryption result we need is a single byte, the only necessity is the lowest 8-bits and the rest are useless.
+As the final decryption result we need is a single byte, the only necessity is **the lowest 8-bits** and the rest are **useless**.
 
 What a tragic for eridani club  ^ ^
-![meme](meme.jpg)
+![meme&arg](meme&arg.png)
+
+The **download link** for the deobfed EpsLoader V0.34 is **in the meme image** =)
+
+### Credits
+
+[BotDebug](https://github.com/StackC00ki3): deobfuscation, writer
+
+[Trdyun](https://github.com/trdyun): decryption, authentication bypass
+
+[SagiriXiguajerry](https://github.com/xiguajerry): co-writer
+
+[Xiaoxin_xxecy](https://github.com/ImNotEcy): [_REDACTED_]
