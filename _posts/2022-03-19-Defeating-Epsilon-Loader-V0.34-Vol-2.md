@@ -4,6 +4,10 @@ date: 2022-03-19
 tags: [reverse-engineering, jvm, jni, deobfuscation]
 authors: [BotDebug, Trdyun, SagiriXiguajerry]
 img_path: /assets/eloader034-p2/
+image:
+    path: realCall_preview.png
+    lqip: realCall_preview_lqip.jpg
+    alt: Life-cycle of the obfuscated JVM method invocations
 ---
 
 ## Disclaimer

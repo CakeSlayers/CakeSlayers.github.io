@@ -4,6 +4,10 @@ date: 2023-06-13
 tags: [reverse-engineering, jvm, cryptography, network-packet]
 authors: [BotDebug, Trdyun, SagiriXiguajerry]
 img_path: /assets/eloader034-p3/
+image:
+    path: hexdump_preview.png
+    lqip: hexdump_preview_lqip.jpg
+    alt: Parsed EpsLoader packets
 ---
 
 ## Disclaimer

@@ -4,6 +4,10 @@ date: 2022-02-28
 tags: [reverse-engineering, jvm, indy, cryptography]
 authors: [BotDebug, Trdyun, SagiriXiguajerry]
 img_path: /assets/eloader034-p1/
+image:
+    path: result_preview.png
+    lqip: result_preview_lqip.jpg
+    alt: Invokedynamic Deobfuscation
 ---
 
 Epsilon Loader V0.34 had been considered as "STRONG obfuscated" as well as "uncrackable" by the 2B2T community for a long time.
