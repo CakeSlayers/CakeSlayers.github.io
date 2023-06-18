@@ -88,7 +88,7 @@ To our surprise, most of the invocations were pointed to the native methods. So 
 
 We choose the native method `Java_ESKID_AwUlqtUfLk` for our initial analyze.
 
-![thunk_func](thunk_func.png)
+![thunk_func](https://s1.ax1x.com/2023/06/18/pClfxLq.png)
 
 The IDA has already marked this function as thunk function because it only has a single `jmp` instruction.
 
@@ -149,7 +149,7 @@ The functionalities of all the native methods are the same: they were used for m
 
 The whole life-cycle of the obfuscated JVM method invocations can be summarize as the graph below:
 
-![realCall](realCall.png)
+![realCall](https://s1.ax1x.com/2023/06/18/pClhpwV.png)
 
 In JVM layer, the invocations were hidden by the `invokedynamic` instruction and its invocation to the JNI method will be resolved during runtime.
 
@@ -296,7 +296,7 @@ With the data we extracted, we can write another custom transformer to deobfusca
 
 The deobfuscation process is like the diagram below:
 
-![diff](diff.png)
+![diff](https://s1.ax1x.com/2023/06/18/pClhPFU.png)
 
 Here's the source code: [JniProxyTransformer.java](/assets/eloader034-p2/JniProxyTransformer.java)
 > YOU NEED TO ADD [Gson](https://github.com/google/gson) DEPENDENCY FIRST TO RUN THIS TRANSFORMER!!
@@ -317,15 +317,15 @@ if (classpath.get(proxyInfo.get("clazz")).access == Opcodes.ACC_INTERFACE) {
 
 We can combine part1 and part2 together to form a complete graph:
 
-![overview](overview.png)
+![overview](https://s1.ax1x.com/2023/06/18/pClhiYF.png)
 
 ## Memes
 
 The DLL has backdoor:
 
-![dll_backdoor](dll_backdoor.png)
+![dll_backdoor](https://s1.ax1x.com/2023/06/18/pClhSe0.png)
 
-![ez_botdebug_p2](ez_botdebug_p2.png)
+![ez_botdebug_p2](https://s1.ax1x.com/2023/06/18/pClh9oT.png)
 
 @smallshen hijacked our PCs using his POWERFUL AntiLeak:
 

@@ -20,7 +20,7 @@ So let's look inside the DLL and the related JVM classes to determine what role 
 
 The first thing we want to figure out is the loading process of the DLL in JVM Bytecode-Level, so we search for the string "DLL" using Recaf.
 
-![stringSearchResult](stringSearchResult.png)
+![stringSearchResult](https://s1.ax1x.com/2023/06/18/pClfVVf.png)
 
 It's so lucky that the dll's filename was not encrypted. Taking advantages of that we can find a suspicious class called `ESKID` and its static initizer `clinit` which contains the string.
 
@@ -48,7 +48,7 @@ Based on the knowledge of the `invokedynamic` instruction, we can see `ESKID.a` 
 
 Using Threadtear's power, we can generate a CFG[^4] of the BSM[^3] (The graph below is optimized).
 
-![HandleType](HandleType.png)
+![HandleType](https://s1.ax1x.com/2023/06/18/pClfeIS.png)
 
 Then we can easily find out that the role of the 4th integer argument is to specify the invoke-type:
 
@@ -81,7 +81,7 @@ It's certain that `ESKID.b` is the method for string decryption in this case.
 
 Then we can take a glance at the method `ESKID.b` :
 
-![decryption_process](decryption_process.png)
+![decryption_process](https://s1.ax1x.com/2023/06/18/pClfAqP.png)
 
 (Screenshot above is the last part of `ESKID.b`'s CFG.)
 
@@ -103,7 +103,7 @@ fun decrypt(enc: String): String {
 }
 ```
 
-![visual_decryptor](visual_decryptor.png)
+![visual_decryptor](https://s1.ax1x.com/2023/06/18/pClfZa8.png)
 
 ## Automation
 
@@ -226,7 +226,7 @@ You can download the complete source code of this Indy transformer via this: [St
 
 ## Final results
 
-![result](result.png)
+![result](https://s1.ax1x.com/2023/06/18/pClfnPg.png)
 
 Screenshot above is a part of `ESKID` method.
 

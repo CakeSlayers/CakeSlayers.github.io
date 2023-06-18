@@ -25,10 +25,12 @@ So today we’ll go into details about how we broke their encryption.
 If you have ever tried to capture epsilon loader's network packets, you might be surprised by its **"plain-text"** client-to-server packets and **encrypted** server-to-client packets.
 
 As a result, the content of the client-to-server packet **except** the hwid string can be parsed in ease. Just as the image below:
-![client-to-server.png](client-to-server.png)
+
+![client-to-server](https://s1.ax1x.com/2023/06/18/pCl4CnI.png)
 
 Once we look at the related code in the `$$$$$$$$ESKID$$$$$$$$$c.b()`, we can figured that the hwid string is composed of several system specifications, given by `System.getenv()`, `System.getProperty()` and `Runtime.getRuntime().availableProcessors()`:
-![hwid.png](hwid.png)
+
+![hwid](https://s1.ax1x.com/2023/06/18/pCl4PBt.png)
 
 Finally, the hwid string was encrypted by multiple ciphers, such as `sha-256`, `sha-1`, `sha-512`.
 
@@ -63,7 +65,8 @@ However there are 2 suspicious integer packets we haven't know their function: `
 Consequently, they should have some important roles.
 
 Rolling down just a little we could find pseudocode like this:
-![form_final_key](form_final_key.png)
+
+![form_final_key](https://s1.ax1x.com/2023/06/18/pCl4iHP.png)
 
 Voila! We can see that it is traversing every byte of the encrypted file and doing xor calculations to every byte, just like a decryption process isn't it?
 
@@ -72,10 +75,12 @@ What's more, `unknown1` and `unknown2` are found participating in forming the fi
 Now we can rename them into `xor_key1` and `xor_key2`.
 
 With the information we gathered, the whole server-to-client packet can be parsed in ease:
-![parsed_packet](parsed_packet.png)
+
+![parsed_packet](https://s1.ax1x.com/2023/06/18/pClTvy4.png)
 
 The whole process can be summarized as this diagram:
-![decryption_process.png](decryption_process.png)
+
+![decryption_process](https://s1.ax1x.com/2023/06/18/pClTBsH.png)
 
 ## Bonus: Bug Hunting
 
@@ -86,7 +91,8 @@ At the early stage of our analysis, we tried to brute-force the XOR key in order
 Despite of the same result, the XOR key we brute-forced out was a single byte: **0xfd**, instead of the 32-bit integer **0x3e8fd** that we calculated from the network packets later.
 
 That anomaly aroused our interest in finding its root cause, so we carefully checked the class decryption process and found something wrong with the type:
-![data_loss](data_loss.png)
+
+![data_loss](https://s1.ax1x.com/2023/06/18/pCl4kAf.png)
 
 Just as the image shows, the convertion from 32-bit integer to 8-bit byte can result in data loss because of the narrowed data size.
 
@@ -95,7 +101,8 @@ As a result, all but the 8 lowest bits were discarded in the narrowing primitive
 ### XOR operation
 
 What about the xor operation?
-![xor_operation.png](xor_operation.png)
+
+![xor_operation](https://s1.ax1x.com/2023/06/18/pClTdzD.png)
 
 Xor operation happens in **binary level** and calculates **bit by bit**.
 
@@ -109,16 +116,17 @@ It turns out that even without the higher bits, the calculation process of the l
 As the final decryption result we need is a single byte, the only necessity is **the lowest 8-bits** and the rest are **useless**.
 
 What a tragic for eridani club  ^ ^
-![meme&arg](meme&arg.png)
+
+![meme&arg](https://s1.ax1x.com/2023/06/18/pClTDLd.png)
 
 The **download link** for the deobfed EpsLoader V0.34 is **in the meme image** =)
 
 ### Credits
 
-[BotDebug](https://github.com/StackC00ki3): deobfuscation, writer
+[BotDebug](https://github.com/StackC00ki3): deobfuscation, author
 
 [Trdyun](https://github.com/trdyun): decryption, authentication bypass
 
-[SagiriXiguajerry](https://github.com/xiguajerry): co-writer
+[SagiriXiguajerry](https://github.com/xiguajerry): co-author
 
 [Xiaoxin_xxecy](https://github.com/ImNotEcy): [_REDACTED_]
